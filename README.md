@@ -37,7 +37,7 @@ Compared to the standard number handling:
     - `12KB` produces "12:30"
     - `12KBG` produces "12:45"
 * `G` will convert the number to words
-  - `23` produces "twelve"
+  - `12` produces "twelve"
   - `20GZ` produces "two thousand"
   - `12/0Z/0GZ` produces "twelve million"
 
