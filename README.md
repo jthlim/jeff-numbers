@@ -39,6 +39,7 @@ Compared to the standard number handling:
     - `12KG` produces "12:15"
     - `12KB` produces "12:30"
     - `12KBG` produces "12:45"
+  - Adding `-S` or `*S` will suffix 'a.m.' or 'p.m.'
 * `G` will convert the number to words
   - `12` produces "twelve"
   - `20GZ` produces "two thousand"

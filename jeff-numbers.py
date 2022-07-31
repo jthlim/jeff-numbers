@@ -11,6 +11,7 @@
 #   - K-G will add ":15"
 #   - K-B will add ":30"
 #   - K-BG will add ":45"
+#   - Using 'S' will add 'a.m.' or '*S' will add 'p.m.'
 # * WR or RB for Dollars
 # * KR or RG for Percents
 #
@@ -61,26 +62,31 @@ def lookup(key):
         elif 'DZ' in control:
             result = re.sub(r'\d+$', r'$\g<0>00', result)
             needs_space = True
-        elif 'K' in control:
-            if 'BG' in control:
-                result += ':45'
-                needs_space = True
-            elif 'G' in control:
-                result += ':15'
-                needs_space = True
-            elif 'B' in control:
-                result += ':30'
-                needs_space = True
+        elif 'K' in control or 'BG' in control:
+            if 'K' in control:
+                if 'BG' in control:
+                    result += ':45'
+                elif 'G' in control:
+                    result += ':15'
+                elif 'B' in control:
+                    result += ':30'
+                else:
+                    result += ':00'
             else:
                 result += ':00'
-                needs_space = True
+
+            needs_space = True
             control = control.replace('K', '')
             control = control.replace('B', '')
             control = control.replace('G', '')
-        elif 'BG' in control:
-            control = control.replace('BG', '')
-            result += ':00'
-            needs_space = True
+
+            if 'S' in control:
+                control = control.replace('S', '')
+                if '*' in control:
+                    control = control.replace('*', '')
+                    result += ' p.m.'
+                else:
+                    result += ' a.m.'
         elif 'W' in control or 'B' in control:
             needs_space = True
             control = control.replace('W', '')
