@@ -1,8 +1,11 @@
 # Enhanced number system for Plover
 
+This dictionary should be fully compatible with the default number system, but
+adds a number of enhancements.
+
 Compared to the standard number handling:
 
-* `EU` reverses any stroke, and works with any number of digits
+* `EU` or `U` reverses any stroke, and works with any number of digits
   - `130EU79` produces "97031"
 * `DZ` will convert a number to hundreds of dollars, and works with multiple strokes
   - `1DZ` produces "$100"

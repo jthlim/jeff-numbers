@@ -40,6 +40,7 @@ def lookup(key):
         control = ''.join(c for c in stroke if c not in DIGITS)
         control = control.replace('-', '')
         control = control.replace('EU', '')
+        control = control.replace('U', '')
 
         if 'RB' in control:
             control = control.replace('RB', '')
@@ -138,6 +139,9 @@ def digits(val):
 
     if 'EU' in control:
         control = control.replace('EU', '')
+        result = result[::-1]
+    elif 'U' in control:
+        control = control.replace('U', '')
         result = result[::-1]
 
     if not 'DZ' in control:
