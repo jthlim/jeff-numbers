@@ -2,7 +2,7 @@
 #
 # Differences compared to standard numbers:
 #
-# * EU reverses the entire number, works on more than two digits
+# * E, U or EU reverses the entire number, works on more than two digits
 # * DZ will return hundreds of dollars for the last number written.
 # * D will always double the last digit. Works on multiple and reversed numbers.
 # * Z will always suffix "00"
@@ -40,7 +40,7 @@ def lookup(key):
 
         control = ''.join(c for c in stroke if c not in DIGITS)
         control = control.replace('-', '')
-        control = control.replace('EU', '')
+        control = control.replace('E', '')
         control = control.replace('U', '')
 
         if 'RB' in control:
@@ -143,10 +143,8 @@ def digits(val):
     result = ''.join(c for c in val if c in DIGITS)
     control = ''.join(c for c in val if c not in DIGITS)
 
-    if 'EU' in control:
-        control = control.replace('EU', '')
-        result = result[::-1]
-    elif 'U' in control:
+    if 'E' in control or 'U' in control:
+        control = control.replace('E', '')
         control = control.replace('U', '')
         result = result[::-1]
 

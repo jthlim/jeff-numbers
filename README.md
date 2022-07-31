@@ -5,7 +5,7 @@ adds a number of enhancements.
 
 Compared to the standard number handling:
 
-* `EU` or `U` reverses any stroke, and works with any number of digits
+* `EU`, `E` (for Multisteno) or `U` (for Uni) reverses any stroke, and works with any number of digits
   - `130EU79` produces "97031"
 * `DZ` will convert a number to hundreds of dollars, and works with multiple strokes
   - `1DZ` produces "$100"
