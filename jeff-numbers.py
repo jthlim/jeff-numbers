@@ -174,7 +174,7 @@ def digits(val):
         if 'D' in control:
             result += result[-1]
 
-    if '*' in control and not 'R' in control:
+    if '*' in control and not 'R' in control and not 'S' in control:
         result += '.'
 
     return result
