@@ -18,10 +18,21 @@
 # * R for roman numerals. Use * for lower case.
 # * W or B for ordinal suffixes. (1st, 2nd, 3rd, etc.)
 # * G to convert a number to words
+# * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
 import re
 
 LONGEST_KEY = 10
 DIGITS = '1234567890'
+ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
+PERMITTED_NON_DIGIT_STROKES = {
+    '#R': True,
+    '#R*': True,
+    '#-R': True,
+    '#*R': True,
+    '#W': True,
+    '#-B': True,
+    '#-G': True,
+}
 
 
 def lookup(key):
@@ -29,7 +40,7 @@ def lookup(key):
     needs_space = False
 
     for stroke in key:
-        if not any(c in stroke for c in DIGITS):
+        if not stroke in PERMITTED_NON_DIGIT_STROKES and not any(c in stroke for c in DIGITS):
             raise KeyError
 
         if needs_space:
@@ -39,6 +50,7 @@ def lookup(key):
         result += digits(stroke)
 
         control = ''.join(c for c in stroke if c not in DIGITS)
+        control = control.replace('#', '')
         control = control.replace('-', '')
         control = control.replace('E', '')
         control = control.replace('U', '')
@@ -91,17 +103,17 @@ def lookup(key):
             needs_space = True
             control = control.replace('W', '')
             control = control.replace('B', '')
-            if result[-1] == '1':
+            if len(result) >= 1 and result[-1] == '1':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
                     result += "st"
-            elif result[-1] == '2':
+            elif len(result) >= 1 and result[-1] == '2':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
                     result += "nd"
-            elif result[-1] == '3':
+            elif len(result) >= 1 and result[-1] == '3':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
@@ -109,14 +121,14 @@ def lookup(key):
             else:
                 result += "th"
         elif 'G' in control:
-            match = re.match(r'\d+$', result)
+            match = ENDING_DIGITS_MATCHER.match(result)
             if match:
                 control = control.replace('G', '')
                 needs_space = True
                 words = toWords(match.group(0))
                 result = re.sub(r'\d+$', words, result)
         elif 'R' in control:
-            match = re.search(r'\d+$', result)
+            match = ENDING_DIGITS_MATCHER.search(result)
             if match:
                 value = int(match.group(0))
                 if 1 <= value <= 3999:
@@ -126,14 +138,14 @@ def lookup(key):
                     if '*' in control:
                         control = control.replace('*', '')
                         roman = roman.lower()
-                    result = re.sub(r'\d+$', roman, result)
+                    result = ENDING_DIGITS_MATCHER.sub(roman, result)
 
         control = control.replace('G', '')
         control = control.replace('D', '')
         control = control.replace('Z', '')
+        control = control.replace('*', '')
 
         if control != '':
-            # return 'Control %s: result: %s' % (control, result)
             raise KeyError
 
     return result
@@ -142,6 +154,12 @@ def lookup(key):
 def digits(val):
     result = ''.join(c for c in val if c in DIGITS)
     control = ''.join(c for c in val if c not in DIGITS)
+
+    if val == '0*Z':
+        return ',000'
+
+    if result == '':
+        return result
 
     if 'E' in control or 'U' in control:
         control = control.replace('E', '')
@@ -155,6 +173,9 @@ def digits(val):
 
         if 'D' in control:
             result += result[-1]
+
+    if '*' in control and not 'R' in control:
+        result += '.'
 
     return result
 
@@ -185,6 +206,7 @@ def toRoman(num):
 
 # ---- Adapted from https://programsolve.com/python-to-convert-numbers-to-words-with-source-code/
 
+
 ONE_DIGIT_WORDS = {
     '0': ["zero"],
     '1': ["one"],
@@ -202,6 +224,7 @@ TWO_DIGIT_WORDS = ["ten", "eleven", "twelve"]
 HUNDRED = "hundred"
 LARGE_SUM_WORDS = ["thousand", "million", "billion", "trillion", "quadrillion",
                    "quintillion", "sextillion", "septillion", "octillion", "nonillion"]
+
 
 def toWords(n):
     word = []
@@ -257,4 +280,3 @@ def toWords(n):
             skip = True
 
     return " ".join(map(str.strip, word))
-
