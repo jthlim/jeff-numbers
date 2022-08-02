@@ -55,3 +55,4 @@ Compared to the standard number handling:
 2. Save jeff-numbers.py from this repository
 3. Drag and drop the file into plover, and ensure it is listed above `main.json`
 
+You may also be interested in [jeff-modifiers](https://github.com/jthlim/jeff-modifiers)
