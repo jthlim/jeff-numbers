@@ -96,7 +96,6 @@ def lookup(key):
             if 'S' in control:
                 control = control.replace('S', '')
                 if '*' in control:
-                    control = control.replace('*', '')
                     result += AM_SUFFIX
                 else:
                     result += PM_SUFFIX
@@ -123,24 +122,29 @@ def lookup(key):
                 result += "th"
         elif 'G' in control:
             match = ENDING_DIGITS_MATCHER.match(result)
-            if match:
-                control = control.replace('G', '')
-                needs_space = True
-                words = toWords(match.group(0))
-                result = re.sub(r'\d+$', words, result)
+            if not match:
+                raise KeyError
+            control = control.replace('G', '')
+            needs_space = True
+            words = toWords(match.group(0))
+            result = re.sub(r'\d+$', words, result)
         elif 'R' in control:
             match = ENDING_DIGITS_MATCHER.search(result)
-            if match:
-                value = int(match.group(0))
-                if 1 <= value <= 3999:
-                    control = control.replace('R', '')
-                    needs_space = True
-                    roman = toRoman(value)
-                    if '*' in control:
-                        control = control.replace('*', '')
-                        roman = roman.lower()
-                    result = ENDING_DIGITS_MATCHER.sub(roman, result)
+            if not match:
+                raise KeyError
 
+            value = int(match.group(0))
+            if value < 0 or value > 3999:
+                raise KeyError
+
+            control = control.replace('R', '')
+            needs_space = True
+            roman = toRoman(value)
+
+            if '*' in control:
+                roman = roman.lower()
+            result = ENDING_DIGITS_MATCHER.sub(roman, result)
+        
         control = control.replace('G', '')
         control = control.replace('D', '')
         control = control.replace('Z', '')
