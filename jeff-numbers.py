@@ -33,7 +33,8 @@ PERMITTED_NON_DIGIT_STROKES = {
     '#-B': True,
     '#-G': True,
 }
-
+AM_SUFFIX = ' a.m.'
+PM_SUFFIX = ' p.m.'
 
 def lookup(key):
     result = ''
@@ -96,9 +97,9 @@ def lookup(key):
                 control = control.replace('S', '')
                 if '*' in control:
                     control = control.replace('*', '')
-                    result += ' p.m.'
+                    result += AM_SUFFIX
                 else:
-                    result += ' a.m.'
+                    result += PM_SUFFIX
         elif 'W' in control or 'B' in control:
             needs_space = True
             control = control.replace('W', '')
