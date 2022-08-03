@@ -48,6 +48,8 @@ Compared to the standard number handling:
     - `30GS` produces "thirties"
   - Can be combined with `W-` to give ordinal words:
     -  `12WEUG`: produces "twenty-first"
+    -  This can also be done as a suffix stroke:
+    -  `1Z/#W-G`: produces "one hundredth".
 * `*` will add a decimal point after
   - `12*/34` produces "12.34"
 * `0*Z` will add a comma before the three zeroes

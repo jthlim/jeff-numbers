@@ -22,7 +22,7 @@
 # * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
 import re
 
-LONGEST_KEY = 20
+LONGEST_KEY = 12
 DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
 PERMITTED_NON_DIGIT_STROKES = {
@@ -37,6 +37,7 @@ PERMITTED_NON_DIGIT_STROKES = {
 }
 AM_SUFFIX = ' a.m.'
 PM_SUFFIX = ' p.m.'
+
 
 def lookup(key):
     result = ''
@@ -113,14 +114,12 @@ def lookup(key):
                     words = words[:-3] + 'second'
                 elif words.endswith('three'):
                     words = words[:-5] + 'third'
-                elif words.endswith('five'):
-                    words = words[:-4] + 'fifth'
+                elif words.endswith('ve'):          # fifth and twelfth
+                    words = words[:-2] + 'fth'
                 elif words.endswith('eight'):
                     words += 'h'
                 elif words.endswith('nine'):
                     words = words[:-1] + 'th'
-                elif words.endswith('twelve'):
-                    words = words[:-2] + 'fth'
                 else:
                     words += 'th'
 
@@ -130,19 +129,19 @@ def lookup(key):
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
-                    result += "st"
+                    result += 'st'
             elif len(result) >= 1 and result[-1] == '2':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
-                    result += "nd"
+                    result += 'nd'
             elif len(result) >= 1 and result[-1] == '3':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
-                    result += "rd"
+                    result += 'rd'
             else:
-                result += "th"
+                result += 'th'
         elif 'G' in control:
             match = ENDING_DIGITS_MATCHER.match(result)
             if not match:
@@ -209,10 +208,10 @@ ROMAN_VALUES = [
     1
 ]
 ROMAN_SYMBOLS = [
-    "M", "CM", "D", "CD",
-    "C", "XC", "L", "XL",
-    "X", "IX", "V", "IV",
-    "I"
+    'M', 'CM', 'D', 'CD',
+    'C', 'XC', 'L', 'XL',
+    'X', 'IX', 'V', 'IV',
+    'I'
 ]
 
 
