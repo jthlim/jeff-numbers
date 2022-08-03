@@ -44,6 +44,8 @@ Compared to the standard number handling:
   - `12` produces "twelve"
   - `20GZ` produces "two thousand"
   - `12/0Z/0GZ` produces "twelve million"
+  - Note that `-S` suffix with Plover's orthography rules will naturally work as expected:
+    - `30GS` produces "thirties"
 * `*` will add a decimal point after
   - `12*/34` produces "12.34"
 * `0*Z` will add a comma before the three zeroes
