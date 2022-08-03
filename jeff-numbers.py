@@ -22,7 +22,7 @@
 import re
 
 LONGEST_KEY = 20
-DIGITS = '1234567890'
+DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
 PERMITTED_NON_DIGIT_STROKES = {
     '#R': True,
@@ -49,12 +49,7 @@ def lookup(key):
             needs_space = False
 
         result += digits(stroke)
-
-        control = ''.join(c for c in stroke if c not in DIGITS)
-        control = control.replace('#', '')
-        control = control.replace('-', '')
-        control = control.replace('E', '')
-        control = control.replace('U', '')
+        control = ''.join(c for c in stroke if c not in '0123456789#-EU')
 
         if 'RB' in control:
             control = control.replace('RB', '')
@@ -88,21 +83,17 @@ def lookup(key):
             else:
                 result += ':00'
 
-            needs_space = True
-            control = control.replace('K', '')
-            control = control.replace('B', '')
-            control = control.replace('G', '')
-
             if 'S' in control:
-                control = control.replace('S', '')
                 if '*' in control:
                     result += AM_SUFFIX
                 else:
                     result += PM_SUFFIX
+
+            control = ''.join(c for c in stroke if c not in 'KBGS')
+            needs_space = True
         elif 'W' in control or 'B' in control:
             needs_space = True
-            control = control.replace('W', '')
-            control = control.replace('B', '')
+            control = ''.join(c for c in stroke if c not in 'WB')
             if len(result) >= 1 and result[-1] == '1':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
@@ -137,19 +128,16 @@ def lookup(key):
             if value < 0 or value > 3999:
                 raise KeyError
 
-            control = control.replace('R', '')
-            needs_space = True
             roman = toRoman(value)
 
             if '*' in control:
                 roman = roman.lower()
             result = ENDING_DIGITS_MATCHER.sub(roman, result)
-        
-        control = control.replace('G', '')
-        control = control.replace('D', '')
-        control = control.replace('Z', '')
-        control = control.replace('*', '')
 
+            control = control.replace('R', '')
+            needs_space = True
+
+        control = ''.join(c for c in control if c not in 'DZ*')
         if control != '':
             raise KeyError
 
@@ -247,18 +235,22 @@ def toWords(n):
         for _ in range(len(num)):
             num = num.lstrip('0')
             if len(num) == 1:
-                # if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1 and (word[-1] in LARGE_SUM_WORDS or HUNDRED in word[-1]):
-                if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i > 0 and (word[-1] in LARGE_SUM_WORDS or HUNDRED in word[-1]):
-                    word.append("and")
+                if len(word) > 0:
+                    if HUNDRED in word[-1] or i == len(sum_list) - 1:
+                        word.append("and")
+                    elif word[-1] in LARGE_SUM_WORDS:
+                        word[-1] = word[-1] + ','
                 word.append(ONE_DIGIT_WORDS[num][0])
                 num = num[1:]
                 break
 
             if len(num) == 2:
                 if num[0] != '0':
-                    # if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1:
-                    if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i > 0:
-                        word.append("and")
+                    if len(word) > 0:
+                        if HUNDRED in word[-1] or i == len(sum_list) - 1:
+                            word.append("and")
+                        elif word[-1] in LARGE_SUM_WORDS:
+                            word[-1] = word[-1] + ','
                     if num.startswith('1'):
                         if int(num[1]) in range(3):
                             word.append(TWO_DIGIT_WORDS[int(num[1])])
