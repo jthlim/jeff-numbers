@@ -21,7 +21,7 @@
 # * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
 import re
 
-LONGEST_KEY = 10
+LONGEST_KEY = 20
 DIGITS = '1234567890'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
 PERMITTED_NON_DIGIT_STROKES = {
@@ -243,7 +243,8 @@ def toWords(n):
         for _ in range(len(num)):
             num = num.lstrip('0')
             if len(num) == 1:
-                if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1 and (word[-1] in LARGE_SUM_WORDS or HUNDRED in word[-1]):
+                # if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1 and (word[-1] in LARGE_SUM_WORDS or HUNDRED in word[-1]):
+                if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i > 0 and (word[-1] in LARGE_SUM_WORDS or HUNDRED in word[-1]):
                     word.append("and")
                 word.append(ONE_DIGIT_WORDS[num][0])
                 num = num[1:]
@@ -251,7 +252,8 @@ def toWords(n):
 
             if len(num) == 2:
                 if num[0] != '0':
-                    if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1:
+                    # if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i == len(sum_list) - 1:
+                    if (len(sum_list) > 1 or (len(sum_list) == 1 and len(sum_list[0]) == 3)) and i > 0:
                         word.append("and")
                     if num.startswith('1'):
                         if int(num[1]) in range(3):
@@ -263,7 +265,7 @@ def toWords(n):
                                 number + ("teen" if not number[-1] == 't' else "een"))
                     else:
                         word.append(ONE_DIGIT_WORDS[num[0]][1 if int(num[0]) in range(2, 6) else 0] + (
-                            "ty " if num[0] != '8' else 'y ') + (ONE_DIGIT_WORDS[num[1]][0] if num[1] != '0' else ""))
+                            "ty" if num[0] != '8' else 'y') + ('-' + ONE_DIGIT_WORDS[num[1]][0] if num[1] != '0' else ""))
                     break
                 else:
                     num = num[1:]
@@ -271,6 +273,8 @@ def toWords(n):
 
             if len(num) == 3:
                 if num[0] != '0':
+                    if len(word) > 0:
+                        word[-1] = word[-1] + ','
                     word.append(ONE_DIGIT_WORDS[num[0]][0] + " " + HUNDRED)
                     if num[1:] == '00':
                         break
