@@ -17,7 +17,8 @@
 #
 # * R for roman numerals. Use * for lower case.
 # * W or B for ordinal suffixes. (1st, 2nd, 3rd, etc.)
-# * G to convert a number to words
+# * G to convert a number to words.
+#   - Can be combined with 'W' to give ordinal words
 # * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
 import re
 
@@ -32,6 +33,7 @@ PERMITTED_NON_DIGIT_STROKES = {
     '#W': True,
     '#-B': True,
     '#-G': True,
+    '#W-G': True,
 }
 AM_SUFFIX = ' a.m.'
 PM_SUFFIX = ' p.m.'
@@ -89,12 +91,42 @@ def lookup(key):
                 else:
                     result += PM_SUFFIX
 
-            control = ''.join(c for c in stroke if c not in 'KBGS')
+            control = ''.join(c for c in control if c not in 'KBGS')
             needs_space = True
         elif 'W' in control or 'B' in control:
+            match = ENDING_DIGITS_MATCHER.match(result)
+            if not match:
+                raise KeyError
+
             needs_space = True
-            control = ''.join(c for c in stroke if c not in 'WB')
-            if len(result) >= 1 and result[-1] == '1':
+            control = ''.join(c for c in control if c not in 'WB')
+
+            if 'G' in control:
+                control = control.replace('G', '')
+                words = toWords(match.group(0))
+
+                if words.endswith('ty'):
+                    words = words[:-1] + 'ieth'
+                elif words.endswith('one'):
+                    words = words[:-3] + 'first'
+                elif words.endswith('two'):
+                    words = words[:-3] + 'second'
+                elif words.endswith('three'):
+                    words = words[:-5] + 'third'
+                elif words.endswith('five'):
+                    words = words[:-4] + 'fifth'
+                elif words.endswith('eight'):
+                    words += 'h'
+                elif words.endswith('nine'):
+                    words = words[:-1] + 'th'
+                elif words.endswith('twelve'):
+                    words = words[:-2] + 'fth'
+                else:
+                    words += 'th'
+
+                result = ENDING_DIGITS_MATCHER.sub(words, result)
+
+            elif len(result) >= 1 and result[-1] == '1':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
@@ -118,7 +150,7 @@ def lookup(key):
             control = control.replace('G', '')
             needs_space = True
             words = toWords(match.group(0))
-            result = re.sub(r'\d+$', words, result)
+            result = ENDING_DIGITS_MATCHER.sub(words, result)
         elif 'R' in control:
             match = ENDING_DIGITS_MATCHER.search(result)
             if not match:
@@ -155,13 +187,10 @@ def digits(val):
         return result
 
     if 'E' in control or 'U' in control:
-        control = control.replace('E', '')
-        control = control.replace('U', '')
         result = result[::-1]
 
     if not 'DZ' in control:
         if 'Z' in control:
-            control = control.replace('Z', '')
             result += '00'
 
         if 'D' in control:
@@ -220,6 +249,9 @@ LARGE_SUM_WORDS = ["thousand", "million", "billion", "trillion", "quadrillion",
 
 
 def toWords(n):
+    if all(c == '0' for c in n):
+        return ONE_DIGIT_WORDS['0'][0]
+
     word = []
 
     if len(n) % 3 != 0 and len(n) > 3:
