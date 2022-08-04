@@ -22,7 +22,7 @@
 # * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
 import re
 
-LONGEST_KEY = 12
+LONGEST_KEY = 20
 DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
 PERMITTED_NON_DIGIT_STROKES = {
@@ -42,8 +42,12 @@ PM_SUFFIX = ' p.m.'
 def lookup(key):
     result = ''
     needs_space = False
+    next_error = False
 
     for stroke in key:
+        if next_error:
+            raise KeyError
+
         if not stroke in PERMITTED_NON_DIGIT_STROKES and not any(c in stroke for c in DIGITS):
             raise KeyError
 
@@ -92,14 +96,16 @@ def lookup(key):
                 else:
                     result += PM_SUFFIX
 
-            control = ''.join(c for c in control if c not in 'KBGS')
             needs_space = True
+            next_error = True
+            control = ''.join(c for c in control if c not in 'KBGS')
         elif 'W' in control or 'B' in control:
             match = ENDING_DIGITS_MATCHER.match(result)
             if not match:
                 raise KeyError
 
             needs_space = True
+            next_error = True
             control = ''.join(c for c in control if c not in 'WB')
 
             if 'G' in control:
@@ -148,6 +154,7 @@ def lookup(key):
                 raise KeyError
             control = control.replace('G', '')
             needs_space = True
+            next_error = True
             words = toWords(match.group(0))
             result = ENDING_DIGITS_MATCHER.sub(words, result)
         elif 'R' in control:
@@ -167,6 +174,7 @@ def lookup(key):
 
             control = control.replace('R', '')
             needs_space = True
+            next_error = True
 
         control = ''.join(c for c in control if c not in 'DZ*')
         if control != '':
