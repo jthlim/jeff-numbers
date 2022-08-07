@@ -10,10 +10,17 @@ Compared to the standard number handling:
 * `DZ` will convert a number to hundreds of dollars, and works with multiple strokes
   - `1DZ` produces "$100"
   - `1/2DZ` produces "$1200"
-* `Z` will always suffix "00"
+* `Z` will suffix "00"
   - `2Z` produces "200"
   - `2/3Z` produces "2300"
   - `23Z` produces "2300"
+* `*` will add a decimal point after
+  - `12*/34` produces "12.34"
+* `*S` will add a comma after
+  - `12*S/340*/50` produces "12,340.50"
+* `*Z` will add the suffix ',000'
+  - `12*Z` or `12/*Z` produces "12,000"
+  - `12*Z/*Z` produces "12,000,000"
 * `D` will always double the last digit
   - `1D` produces "11"
   - `12D` produces "122"
@@ -25,6 +32,7 @@ Compared to the standard number handling:
 * `KR-` or `-RB` will prefix the entire number with a dollar symbol
   - `23KR` produces "$23"
   - `1/12KR` produces "$112"
+  - `1*S/234*/50KR` produces "$1,234.50"
 * `WR-` or `-RG` will suffix the entire number with a percent symbol
   - `23WR` produces "23%"
   - `1/12KR` produces "112%"
@@ -47,13 +55,11 @@ Compared to the standard number handling:
   - Note that `-S` suffix with Plover's orthography rules will naturally work as expected:
     - `30GS` produces "thirties"
   - Can be combined with `W-` to give ordinal words:
-    -  `12WEUG`: produces "twenty-first"
+    -  `12WEUG`: produces "twenty-first".
+    -  `1W0GS`: produces "tenths".
     -  This can also be done as a suffix stroke:
     -  `1Z/#W-G`: produces "one hundredth".
-* `*` will add a decimal point after
-  - `12*/34` produces "12.34"
-* `0*Z` will add a comma before the three zeroes
-  - `12/0*Z` produces "12,000"
+
 
 # Installation
 

@@ -1,30 +1,12 @@
 # Jeff's Numbers dictionary for Plover.
 #
-# Differences compared to standard numbers:
-#
-# * E, U or EU reverses the entire number, works on more than two digits
-# * DZ will return hundreds of dollars for the last number written.
-# * D will always double the last digit. Works on multiple and reversed numbers.
-# * Z will always suffix "00"
-# * Clock:
-#   - K- or -BG will add ':00'
-#   - K-G will add ":15"
-#   - K-B will add ":30"
-#   - K-BG will add ":45"
-#   - Using 'S' will add 'a.m.' or '*S' will add 'p.m.'
-# * WR or RB for Dollars
-# * KR or RG for Percents
-#
-# * R for roman numerals. Use * for lower case.
-# * W or B for ordinal suffixes. (1st, 2nd, 3rd, etc.)
-# * G to convert a number to words.
-#   - Can be combined with 'W' to give ordinal words
-# * `*` to add a decimal point after, except when used with 0Z, which will prepend a comma.
+# See README.md for usage details.
 import re
 
 LONGEST_KEY = 20
 DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
+ENDING_NUMBER_MATCHER = re.compile(r'[\d,.]+$')
 PERMITTED_NON_DIGIT_STROKES = {
     '#R': True,
     '#R*': True,
@@ -34,6 +16,14 @@ PERMITTED_NON_DIGIT_STROKES = {
     '#-B': True,
     '#-G': True,
     '#W-G': True,
+    '#*': True,
+    '#*S': True,
+    '#*Z': True,
+
+    '#WR': True,
+    '#KR': True,
+    '#-RB': True,
+    '#RG': True,
 }
 AM_SUFFIX = ' a.m.'
 PM_SUFFIX = ' p.m.'
@@ -55,27 +45,30 @@ def lookup(key):
             result += ' '
             needs_space = False
 
-        result += digits(stroke)
+        stroke_digits = digits(stroke)
+        result += stroke_digits
         control = ''.join(c for c in stroke if c not in '0123456789#-EU')
+        if stroke_digits.endswith(','):
+            control = control.replace('*S', '')
 
         if 'RB' in control:
             control = control.replace('RB', '')
-            result = re.sub(r'\d+$', r'$\g<0>', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>', result)
             needs_space = True
         elif 'WR' in control:
             control = control.replace('WR', '')
-            result = re.sub(r'\d+$', r'$\g<0>', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>', result)
             needs_space = True
         elif 'KR' in control:
             control = control.replace('KR', '')
-            result = re.sub(r'\d+$', r'\g<0>%', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'\g<0>%', result)
             needs_space = True
         elif 'RG' in control:
             control = control.replace('RG', '')
-            result = re.sub(r'\d+$', r'\g<0>%', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'\g<0>%', result)
             needs_space = True
         elif 'DZ' in control:
-            result = re.sub(r'\d+$', r'$\g<0>00', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>00', result)
             needs_space = True
         elif 'K' in control or 'BG' in control:
             if 'K' in control:
@@ -99,19 +92,13 @@ def lookup(key):
             needs_space = True
             next_error = True
             control = ''.join(c for c in control if c not in 'KBGS')
-        elif 'W' in control or 'B' in control:
+        elif 'G' in control:
             match = ENDING_DIGITS_MATCHER.match(result)
             if not match:
                 raise KeyError
+            words = toWords(match.group(0))
 
-            needs_space = True
-            next_error = True
-            control = ''.join(c for c in control if c not in 'WB')
-
-            if 'G' in control:
-                control = control.replace('G', '')
-                words = toWords(match.group(0))
-
+            if 'W' in control:
                 if words.endswith('ty'):
                     words = words[:-1] + 'ieth'
                 elif words.endswith('one'):
@@ -129,9 +116,20 @@ def lookup(key):
                 else:
                     words += 'th'
 
-                result = ENDING_DIGITS_MATCHER.sub(words, result)
+            result = ENDING_DIGITS_MATCHER.sub(words, result)
+            needs_space = True
+            next_error = True
+            control = ''.join(c for c in control if c not in 'WG')
+        elif 'W' in control or 'B' in control:
+            match = ENDING_DIGITS_MATCHER.match(result)
+            if not match:
+                raise KeyError
 
-            elif len(result) >= 1 and result[-1] == '1':
+            needs_space = True
+            next_error = True
+            control = ''.join(c for c in control if c not in 'WB')
+
+            if len(result) >= 1 and result[-1] == '1':
                 if len(result) >= 2 and result[-2] == '1':
                     result += 'th'
                 else:
@@ -148,15 +146,6 @@ def lookup(key):
                     result += 'rd'
             else:
                 result += 'th'
-        elif 'G' in control:
-            match = ENDING_DIGITS_MATCHER.match(result)
-            if not match:
-                raise KeyError
-            control = control.replace('G', '')
-            needs_space = True
-            next_error = True
-            words = toWords(match.group(0))
-            result = ENDING_DIGITS_MATCHER.sub(words, result)
         elif 'R' in control:
             match = ENDING_DIGITS_MATCHER.search(result)
             if not match:
@@ -187,23 +176,25 @@ def digits(val):
     result = ''.join(c for c in val if c in DIGITS)
     control = ''.join(c for c in val if c not in DIGITS)
 
-    if val == '0*Z':
-        return ',000'
-
-    if result == '':
-        return result
-
     if 'E' in control or 'U' in control:
+        control = ''.join(c for c in control if c not in 'EU')
         result = result[::-1]
 
     if not 'DZ' in control:
         if 'Z' in control:
-            result += '00'
+            if '*' in control:
+                result += ',000'
+            else:
+                result += '00'
+            control = ''.join(c for c in control if c not in '*Z')
 
         if 'D' in control:
             result += result[-1]
+            result = result.replace('D', '')
 
-    if '*' in control and not 'R' in control and not 'S' in control:
+    if control == '*S' or control == '#*S':
+        return result + ','
+    elif '*' in control and not any(c in 'RSZ' for c in control):
         result += '.'
 
     return result
