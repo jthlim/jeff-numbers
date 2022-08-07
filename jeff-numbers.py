@@ -7,24 +7,6 @@ LONGEST_KEY = 20
 DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
 ENDING_NUMBER_MATCHER = re.compile(r'[\d,.]+$')
-PERMITTED_NON_DIGIT_STROKES = {
-    '#R': True,
-    '#R*': True,
-    '#-R': True,
-    '#*R': True,
-    '#W': True,
-    '#-B': True,
-    '#-G': True,
-    '#W-G': True,
-    '#*': True,
-    '#*S': True,
-    '#*Z': True,
-
-    '#WR': True,
-    '#KR': True,
-    '#-RB': True,
-    '#RG': True,
-}
 AM_SUFFIX = ' a.m.'
 PM_SUFFIX = ' p.m.'
 
@@ -38,7 +20,7 @@ def lookup(key):
         if next_error:
             raise KeyError
 
-        if not stroke in PERMITTED_NON_DIGIT_STROKES and not any(c in stroke for c in DIGITS):
+        if not any(c in stroke for c in DIGITS) and not '#' in stroke:
             raise KeyError
 
         if needs_space:
@@ -93,10 +75,10 @@ def lookup(key):
             next_error = True
             control = ''.join(c for c in control if c not in 'KBGS')
         elif 'G' in control:
-            match = ENDING_DIGITS_MATCHER.match(result)
+            match = ENDING_NUMBER_MATCHER.match(result)
             if not match:
                 raise KeyError
-            words = toWords(match.group(0))
+            words = toWords(''.join(c for c in match.group(0) if c in DIGITS))
 
             if 'W' in control:
                 if words.endswith('ty'):
@@ -116,7 +98,7 @@ def lookup(key):
                 else:
                     words += 'th'
 
-            result = ENDING_DIGITS_MATCHER.sub(words, result)
+            result = ENDING_NUMBER_MATCHER.sub(words, result)
             needs_space = True
             next_error = True
             control = ''.join(c for c in control if c not in 'WG')
