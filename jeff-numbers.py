@@ -6,7 +6,7 @@ import re
 LONGEST_KEY = 20
 DIGITS = '0123456789'
 ENDING_DIGITS_MATCHER = re.compile(r'\d+$')
-ENDING_NUMBER_MATCHER = re.compile(r'[\d,.]+$')
+ENDING_NUMBER_MATCHER = re.compile(r'.?\d[\d,.]*$')
 AM_SUFFIX = ' a.m.'
 PM_SUFFIX = ' p.m.'
 
@@ -172,7 +172,7 @@ def digits(val):
 
         if 'D' in control:
             result += result[-1]
-            result = result.replace('D', '')
+            control = control.replace('D', '')
 
     if control == '*S' or control == '#*S':
         return result + ','
