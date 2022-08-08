@@ -75,7 +75,7 @@ def lookup(key):
             next_error = True
             control = ''.join(c for c in control if c not in 'KBGS')
         elif 'G' in control:
-            match = ENDING_NUMBER_MATCHER.match(result)
+            match = ENDING_NUMBER_MATCHER.search(result)
             if not match:
                 raise KeyError
             words = toWords(''.join(c for c in match.group(0) if c in DIGITS))
@@ -103,7 +103,7 @@ def lookup(key):
             next_error = True
             control = ''.join(c for c in control if c not in 'WG')
         elif 'W' in control or 'B' in control:
-            match = ENDING_DIGITS_MATCHER.match(result)
+            match = ENDING_DIGITS_MATCHER.search(result)
             if not match:
                 raise KeyError
 
@@ -129,11 +129,11 @@ def lookup(key):
             else:
                 result += 'th'
         elif 'R' in control:
-            match = ENDING_DIGITS_MATCHER.search(result)
+            match = ENDING_NUMBER_MATCHER.search(result)
             if not match:
                 raise KeyError
 
-            value = int(match.group(0))
+            value = int(''.join(c for c in match.group(0) if c in DIGITS))
             if value < 0 or value > 3999:
                 raise KeyError
 
@@ -141,7 +141,7 @@ def lookup(key):
 
             if '*' in control:
                 roman = roman.lower()
-            result = ENDING_DIGITS_MATCHER.sub(roman, result)
+            result = ENDING_NUMBER_MATCHER.sub(roman, result)
 
             control = control.replace('R', '')
             needs_space = True
