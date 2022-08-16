@@ -53,23 +53,19 @@ def lookup(key):
             result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>00', result)
             needs_space = True
         elif 'K' in control or 'BG' in control:
-            if 'K' in control:
-                if 'BG' in control:
-                    result += ':45'
-                elif 'G' in control:
-                    result += ':15'
-                elif 'B' in control:
-                    result += ':30'
-                else:
-                    result += ':00'
+            if 'K' not in control:
+                result += ':00'
+            elif 'BG' in control:
+                result += ':45'
+            elif 'G' in control:
+                result += ':15'
+            elif 'B' in control:
+                result += ':30'
             else:
                 result += ':00'
 
             if 'S' in control:
-                if '*' in control:
-                    result += AM_SUFFIX
-                else:
-                    result += PM_SUFFIX
+                result += PM_SUFFIX if '*' in control else AM_SUFFIX
 
             needs_space = True
             next_error = True
@@ -98,7 +94,7 @@ def lookup(key):
                 else:
                     words += 'th'
 
-            result = ENDING_NUMBER_MATCHER.sub(words, result)
+            result = match.expand(words)
             needs_space = True
             next_error = True
             control = ''.join(c for c in control if c not in 'WG')
@@ -112,20 +108,11 @@ def lookup(key):
             control = ''.join(c for c in control if c not in 'WB')
 
             if len(result) >= 1 and result[-1] == '1':
-                if len(result) >= 2 and result[-2] == '1':
-                    result += 'th'
-                else:
-                    result += 'st'
-            elif len(result) >= 1 and result[-1] == '2':
-                if len(result) >= 2 and result[-2] == '1':
-                    result += 'th'
-                else:
-                    result += 'nd'
+                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'st'
+            elif len(result) >= 1 and result[-1] == '2':                
+                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'nd'
             elif len(result) >= 1 and result[-1] == '3':
-                if len(result) >= 2 and result[-2] == '1':
-                    result += 'th'
-                else:
-                    result += 'rd'
+                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'rd'
             else:
                 result += 'th'
         elif 'R' in control:
@@ -141,7 +128,7 @@ def lookup(key):
 
             if '*' in control:
                 roman = roman.lower()
-            result = ENDING_NUMBER_MATCHER.sub(roman, result)
+            result = match.expand(roman)
 
             control = control.replace('R', '')
             needs_space = True
@@ -164,10 +151,7 @@ def digits(val):
 
     if not 'DZ' in control:
         if 'Z' in control:
-            if '*' in control:
-                result += ',000'
-            else:
-                result += '00'
+            result += ',000' if '*' in control else '00'
             control = ''.join(c for c in control if c not in '*Z')
 
         if 'D' in control:
@@ -175,7 +159,7 @@ def digits(val):
             control = control.replace('D', '')
 
     if control == '*S' or control == '#*S':
-        return result + ','
+        result += ','
     elif '*' in control and not any(c in 'RSZ' for c in control):
         result += '.'
 
