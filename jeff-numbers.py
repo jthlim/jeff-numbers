@@ -155,7 +155,8 @@ def digits(val):
             control = ''.join(c for c in control if c not in '*Z')
 
         if 'D' in control:
-            result += result[-1]
+            if len(result) > 0:
+                result += result[-1]
             control = control.replace('D', '')
 
     if control == '*S' or control == '#*S':
