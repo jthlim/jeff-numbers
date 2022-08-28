@@ -49,10 +49,10 @@ Compared to the standard number handling:
     - `12KBG` produces "12:45"
   - Adding `-S` or `*S` will suffix 'a.m.' or 'p.m.'
 * `G` will convert the number to words
-  - `12` produces "twelve"
-  - `20GZ` produces "two thousand"
-  - `12/0Z/0GZ` produces "twelve million"
-  - Note that `-S` suffix with Plover's orthography rules will naturally work as expected:
+  - `12G` produces "twelve"
+  - `2*GZ` produces "two thousand"
+  - `12*Z/*GZ` produces "twelve million"
+  - Note that `-S` suffix with Plover's orthography rules will work as expected:
     - `30GS` produces "thirties"
   - Can be combined with `W-` to give ordinal words:
     -  `12WEUG`: produces "twenty-first".
