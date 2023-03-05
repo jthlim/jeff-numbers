@@ -29,14 +29,14 @@ Compared to the standard number handling:
   - `12R` produces "XII"
   - `19/29EUR` produces "MCMXCII" (1992 in roman numerals)
   - This will only work for numbers between 1 and 3999 inclusive.
-* `KR-` or `-RB` will prefix the entire number with a dollar symbol
-  - `23KR` produces "$23"
-  - `1/12KR` produces "$112"
-  - `1*S/234*/50KR` produces "$1,234.50"
-* `WR-` or `-RG` will suffix the entire number with a percent symbol
-  - `23WR` produces "23%"
+* `WR-` or `-RB` will prefix the entire number with a dollar symbol
+  - `23WR` or `23-RB` produces "$23"
+  - `1/12WR` produces "$112"
+  - `1*S/234*/50WR` produces "$1,234.50"
+* `KR-` or `-RG` will suffix the entire number with a percent symbol
+  - `23KR` or `23-RG` produces "23%"
   - `1/12KR` produces "112%"
-  - `1WRZ` produces "100%"
+  - `1KRZ` produces "100%"
 * `W` or `B` will add ordinal suffixes:
   - `1B` produces "1st"
   - `1BD` or `1/1B` produces "11th"

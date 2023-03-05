@@ -15,6 +15,7 @@ def lookup(key):
     result = ''
     needs_space = False
     next_error = False
+    use_glue = True
 
     for stroke in key:
         if next_error:
@@ -69,6 +70,7 @@ def lookup(key):
 
             needs_space = True
             next_error = True
+            use_glue = False
             control = ''.join(c for c in control if c not in 'KBGS')
         elif 'G' in control:
             match = ENDING_NUMBER_MATCHER.search(result)
@@ -97,6 +99,7 @@ def lookup(key):
             result = match.expand(words)
             needs_space = True
             next_error = True
+            use_glue = False
             control = ''.join(c for c in control if c not in 'WG')
         elif 'W' in control or 'B' in control:
             match = ENDING_DIGITS_MATCHER.search(result)
@@ -105,14 +108,18 @@ def lookup(key):
 
             needs_space = True
             next_error = True
+            use_glue = False
             control = ''.join(c for c in control if c not in 'WB')
 
             if len(result) >= 1 and result[-1] == '1':
-                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'st'
-            elif len(result) >= 1 and result[-1] == '2':                
-                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'nd'
+                result += 'th' if len(
+                    result) >= 2 and result[-2] == '1' else 'st'
+            elif len(result) >= 1 and result[-1] == '2':
+                result += 'th' if len(
+                    result) >= 2 and result[-2] == '1' else 'nd'
             elif len(result) >= 1 and result[-1] == '3':
-                result += 'th' if len(result) >= 2 and result[-2] == '1' else 'rd'
+                result += 'th' if len(
+                    result) >= 2 and result[-2] == '1' else 'rd'
             else:
                 result += 'th'
         elif 'R' in control:
@@ -133,10 +140,14 @@ def lookup(key):
             control = control.replace('R', '')
             needs_space = True
             next_error = True
+            use_glue = False
 
         control = ''.join(c for c in control if c not in 'DZ*')
         if control != '':
             raise KeyError
+
+    if use_glue:
+        result = "{&%s}" % result
 
     return result
 
