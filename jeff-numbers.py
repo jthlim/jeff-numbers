@@ -36,25 +36,37 @@ def lookup(key):
 
         if 'RB' in control:
             control = control.replace('RB', '')
-            result = ENDING_NUMBER_MATCHER.sub(r'\g<0> {*($c)}', result)
+            if len(result) >= 1 and result[-1] == '.':
+                result = result + r'0 {*($c)}'
+            else:
+                result = result + r' {*($c)}'
             use_glue = False
             needs_space = True
+            next_error = True
         elif 'WR' in control:
             control = control.replace('WR', '')
-            result = ENDING_NUMBER_MATCHER.sub(r'\g<0> {*($c)}', result)
+            if len(result) >= 1 and result[-1] == '.':
+                result = result + r'0 {*($c)}'
+            else:
+                result = result + r' {*($c)}'
             use_glue = False
             needs_space = True
+            next_error = True
         elif 'KR' in control:
             control = control.replace('KR', '')
             result = ENDING_NUMBER_MATCHER.sub(r'\g<0>%', result)
             needs_space = True
+            next_error = True
         elif 'RG' in control:
             control = control.replace('RG', '')
             result = ENDING_NUMBER_MATCHER.sub(r'\g<0>%', result)
             needs_space = True
+            next_error = True
         elif 'DZ' in control:
-            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>00', result)
+            result = result + r'00 {*($c)}'
             needs_space = True
+            next_error = True
+            use_glue = False
         elif 'K' in control or 'BG' in control:
             if 'K' not in control:
                 result += ':00'
@@ -174,7 +186,7 @@ def digits(val):
 
     if control == '*S' or control == '#*S':
         result += ','
-    elif '*' in control and not any(c in 'RSZ' for c in control):
+    elif '*' in control and (not any(c in 'RSZ' for c in control) or control == "*RB" or control == "WR*"):
         result += '.'
 
     return result
