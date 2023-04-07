@@ -36,11 +36,13 @@ def lookup(key):
 
         if 'RB' in control:
             control = control.replace('RB', '')
-            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'\g<0> {*($c)}', result)
+            use_glue = False
             needs_space = True
         elif 'WR' in control:
             control = control.replace('WR', '')
-            result = ENDING_NUMBER_MATCHER.sub(r'$\g<0>', result)
+            result = ENDING_NUMBER_MATCHER.sub(r'\g<0> {*($c)}', result)
+            use_glue = False
             needs_space = True
         elif 'KR' in control:
             control = control.replace('KR', '')
