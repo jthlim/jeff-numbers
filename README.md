@@ -18,6 +18,9 @@ Compared to the standard number handling:
   - `12*/34` produces "12.34"
 - `*S` will add a comma after
   - `12*S/340*/50` produces "12,340.50"
+- `*DZ` will convert a number to thousands of dollars, and works with multiple strokes
+  - `3*DZ` or `3/#*DZ` produces "$3,000"
+  - `256/0*DZ` produces "$2,560,000"
 - `*Z` will add the suffix ',000'
   - `12*Z` or `12/*Z` produces "12,000"
   - `12*Z/*Z` produces "12,000,000"
