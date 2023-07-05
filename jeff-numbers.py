@@ -63,7 +63,10 @@ def lookup(key):
             needs_space = True
             next_error = True
         elif 'DZ' in control:
-            result = result + r'00 {*($c)}'
+            if '*' in control:
+                result = result + r'000 {*($c)}'
+            else:
+                result = result + r'00 {*($c)}'
             needs_space = True
             next_error = True
             use_glue = False
