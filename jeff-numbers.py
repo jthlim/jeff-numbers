@@ -34,7 +34,33 @@ def lookup(key):
         if stroke_digits.endswith(','):
             control = control.replace('*S', '')
 
-        if 'RB' in control:
+        if 'KWR' in control:
+            control = control.replace('KWR', '')
+            match = ENDING_NUMBER_MATCHER.search(result)
+            if not match:
+                raise KeyError
+
+            value = int(''.join(c for c in match.group(0) if c in DIGITS))
+            if value < 0 or value > 3999:
+                raise KeyError
+
+            result = '%d{}' % (value + 1900)
+            use_glue = False
+            next_error = True
+        elif 'RBG' in control:
+            control = control.replace('RBG', '')
+            match = ENDING_NUMBER_MATCHER.search(result)
+            if not match:
+                raise KeyError
+
+            value = int(''.join(c for c in match.group(0) if c in DIGITS))
+            if value < 0 or value > 3999:
+                raise KeyError
+
+            result = '%d{}' % (value + 2000)
+            use_glue = False
+            next_error = True
+        elif 'RB' in control:
             control = control.replace('RB', '')
             if len(result) >= 1 and result[-1] == '.':
                 result = result + r'0 {*($c)}'
@@ -63,10 +89,7 @@ def lookup(key):
             needs_space = True
             next_error = True
         elif 'DZ' in control:
-            if '*' in control:
-                result = result + r'000 {*($c)}'
-            else:
-                result = result + r'00 {*($c)}'
+            result = result + r'00 {*($c)}'
             needs_space = True
             next_error = True
             use_glue = False

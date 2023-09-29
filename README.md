@@ -18,9 +18,6 @@ Compared to the standard number handling:
   - `12*/34` produces "12.34"
 - `*S` will add a comma after
   - `12*S/340*/50` produces "12,340.50"
-- `*DZ` will convert a number to thousands of dollars, and works with multiple strokes
-  - `3*DZ` or `3/#*DZ` produces "$3,000"
-  - `256/0*DZ` produces "$2,560,000"
 - `*Z` will add the suffix ',000'
   - `12*Z` or `12/*Z` produces "12,000"
   - `12*Z/*Z` produces "12,000,000"
@@ -32,6 +29,10 @@ Compared to the standard number handling:
   - `12R` produces "XII"
   - `19/29EUR` produces "MCMXCII" (1992 in roman numerals)
   - This will only work for numbers between 1 and 3999 inclusive.
+- `KWR-` and `-RBG` are used to type years in a single stroke
+  - `KWR-` will add 1900 to the value, while `-RBG` will add 2000 to it.
+  - `24-RBG` produces "2024"
+  - `KWR0EU8` produces "1980"
 - `WR-` or `-RB` will format the entire number as a dollar value.
   - `23WR` or `23-RB` produces "$23"
   - `1/12RB` produces "$112"
